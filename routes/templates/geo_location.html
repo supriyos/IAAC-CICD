@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>Test Chat</h1>
+        <!-- <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form> -->
+        <ul id='messages'>
+        </ul>
+        <script>
+            var ws = new WebSocket("wss://bms5spxaid.execute-api.eu-west-2.amazonaws.com/production");
+            ws.onopen = function(){
+                console.log("connection open");                
+                ws.send(JSON.stringify({ 'action':'sendMessage', 'message':'Hello1' }));
+                console.log("message sent...");
+            }
+            ws.onmessage = function(event) {
+                event.preventDefault()
+                console.log(event.data)
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+                ws.send(JSON.stringify({ 'action':'sendMessage', 'message':'Hello2' }));
+            };
+            
+            ws.onclose = function(event){
+                console.log("Connection closed")
+                
+            }
+            // function sendMessage(event) {
+            //     var input = document.getElementById("messageText")
+            //     ws.send(input.value)
+            //     input.value = ''
+            //     event.preventDefault()
+            // }
+        </script>
+    </body>
+</html>

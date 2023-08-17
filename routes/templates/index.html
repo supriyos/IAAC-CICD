@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Chatbot Application</title>
+	<!--<link rel="stylesheet" href="style.css">-->
+	<style> 
+			body {
+		    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		    background-color: #1e1f29;
+		    margin: 0;
+		    padding: 0;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    min-height: 100vh;
+		 }
+		 
+		 .chat-container {
+		    max-width: 500px;
+		    width: 100%;
+		    border-radius: 15px;
+		    background: linear-gradient(to right, #007bff, #00b4d8);
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		    overflow: hidden;
+		 }
+		 
+		 .chat-header {
+		    display: flex;
+		    align-items: center;
+		    padding: 20px;
+		    background-color: transparent;
+		    color: #fff;
+		 }
+		 
+		 .chat-header img {
+		    width: 40px;
+		    height: 40px;
+		    margin-right: 10px;
+		 }
+		 
+		 .chat-header h1 {
+		    font-size: 24px;
+		    margin: 0;
+		 }
+		 
+		 .chat-log {
+		    padding: 20px;
+		    max-height: 300px;
+		    overflow-y: auto;
+		 }
+		 
+		 .message {
+		    margin-bottom: 15px;
+		    padding: 10px 20px;
+		    border-radius: 25px;
+		    max-width: 80%;
+		 }
+		 
+		 .user {
+		    background-color: #007bff;
+		    color: #fff;
+		    align-self: flex-end;
+		 }
+		 
+		 .bot {
+		    background-color: #fff;
+		    color: #333;
+		    align-self: flex-start;
+		 }
+		 
+		 .chat-input {
+		    display: flex;
+		    padding: 20px;
+		    border-top: 1px solid rgba(255, 255, 255, 0.2);
+		 }
+		 
+		 input[type="text"] {
+		    flex: 1;
+		    padding: 15px;
+		    border: none;
+		    border-radius: 25px;
+		    background-color: rgba(255, 255, 255, 0.2);
+		    color: #fff;
+		    outline: none;
+		    font-size: 16px;
+		 }
+		 
+		 button {
+		    margin-left: 10px;
+		    padding: 15px 30px;
+		    background-color: #00b4d8;
+		    border-color: #fff;
+		    color: #fff;
+		    border: none;
+		    border-radius: 25px;
+		    cursor: pointer;
+		    font-size: 16px;
+		    transition: background-color 0.2s ease-in-out;
+		 }
+		 
+		 button:hover {
+		    background-color: #00e792;
+		 }
+	</style>
+</head>
+<body>
+<div class="chat-container">
+	<div class="chat-header">
+		<h1>AWS Infrastructure As a Chat(IaaC) </h1>
+	</div>
+
+	<div class="chat-input">
+		<input type="text" id="userInput" placeholder="Type your message...">
+		<button id="sendButton">Send</button>
+	</div>
+
+	<div class="chat-log" id="chatLog">
+		<!-- Chat messages will be added here dynamically -->
+	</div>
+</div>
+
+<!--<script src="script.js"></script>-->
+<script>
+	// Declare webocket and connect.
+	// actual websocket conn to be used
+	// var ws = new WebSocket("wss://bms5spxaid.execute-api.eu-west-2.amazonaws.com/prods");
+	var ws = new WebSocket("wss://q34aqje75f.execute-api.eu-west-2.amazonaws.com/production");
+	
+	ws.onopen = function(){
+		console.log("connection open");                
+	}
+	
+	ws.onmessage = function(event) {
+			appendMessage("Bot", "Bot: " + JSON.parse(event.data).replace(/\\n/g, '\n'));
+	       // Add your logic and appendMessage("bot", botResponse);
+	       userInput.value = "";
+	}
+	
+	ws.onclose = function(event){
+		console.log("Connection closed")
+	}
+	
+	const chatLog = document.getElementById("chatLog");
+	const userInput = document.getElementById("userInput");
+	const sendButton = document.getElementById("sendButton");
+	
+	sendButton.addEventListener("click", sendMessage);
+	
+	
+	function sendMessage() {
+	   const userMessage = userInput.value.trim();
+	   if (userMessage !== "") {
+			appendMessage("User", "User: " + userMessage);
+			// Add your logic and appendMessage("bot", botResponse);
+			userInput.value = "";
+		
+			ws.send(JSON.stringify({ 'action':'sendMessage', 'message': userMessage }));
+			console.log("message sent...");
+	   }
+	}
+	
+	function appendMessage(sender, message) {   
+	   const messageElement = document.createElement("div");
+	   messageElement.classList.add("message", sender);
+	   messageElement.textContent = message;
+	   chatLog.appendChild(messageElement);
+	   chatLog.scrollTop = chatLog.scrollHeight;
+	}
+</script>
+</body>
+</html>
